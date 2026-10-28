@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, BookOpen, Gamepad2, Users, Star, HeartHandshake, Timer, Trophy } from "lucide-react";
+import { Gamepad2, HeartHandshake, Puzzle, Timer, Trophy, UserRoundCheck, Users } from "lucide-react";
 import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
 
 const title = "MindBloom ADHD Kids — Learn, Grow & Shine";
 const description =
-  "Engaging learning activities, parent guidance and personalized support helping children with ADHD build confidence, focus and life skills.";
+  "Engaging learning activities, parent guidance and personalized support helping children with Attention-Deficit/Hyperactivity Disorder (ADHD) build confidence, focus and life skills.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,11 +26,27 @@ const highlights = [
   { icon: Trophy, label: "Progress Tracking" },
 ];
 
-const services = [
-  { icon: Brain, title: "ADHD Coaching", text: "One-on-one sessions that build focus, routine and self-belief." },
-  { icon: BookOpen, title: "Homework Help", text: "Small steps, timers and checklists that make study time calmer." },
-  { icon: Gamepad2, title: "Brain Games", text: "Attention, memory and puzzle play designed by specialists." },
-  { icon: Users, title: "Parent Guidance", text: "Practical training so support continues at home every day." },
+const helps = [
+  {
+    icon: UserRoundCheck,
+    title: "Personalized Learning",
+    text: "Activities tailored to each child's learning pace and needs.",
+  },
+  {
+    icon: Puzzle,
+    title: "Fun Brain Games",
+    text: "Interactive games that encourage attention, memory, logical thinking and problem-solving.",
+  },
+  {
+    icon: Users,
+    title: "Parent Guidance",
+    text: "Practical tips and resources to help parents support their children at home.",
+  },
+  {
+    icon: Trophy,
+    title: "Progress and Encouragement",
+    text: "Positive reinforcement to celebrate small achievements and build confidence.",
+  },
 ];
 
 const testimonials = [
@@ -57,16 +73,14 @@ function Index() {
       <section className="hero-surface">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-grass-soft px-4 py-1.5 text-xs font-bold tracking-wide text-accent-foreground uppercase">
-              <Star className="size-3.5" /> Evidence-informed, family-first
-            </span>
-            <h1 className="mt-5 text-4xl leading-tight font-extrabold sm:text-6xl">
+            <h1 className="text-4xl leading-tight font-extrabold sm:text-6xl">
               Helping Every Child Learn, Grow &amp; Shine
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Every child learns differently. At MindBloom ADHD Kids we provide engaging learning
-              activities, parent guidance and personalized support to help children with ADHD build
-              confidence, focus and life skills.
+              activities, parent guidance and personalized support to help children with
+              Attention-Deficit/Hyperactivity Disorder (ADHD) build confidence, focus and life
+              skills.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="rounded-full font-bold">
@@ -104,25 +118,25 @@ function Index() {
       </section>
 
       <section className="mx-auto mt-20 max-w-6xl px-5">
-        <h2 className="text-3xl font-extrabold">Our Services</h2>
+        <h2 className="text-3xl font-extrabold">How MindBloom Helps Your Child</h2>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Support built around your child's strengths, delivered by psychologists, special educators
-          and occupational therapists.
+          Four building blocks that work together — playful practice for your child, practical
+          support for you.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {services.map((s) => (
-            <article key={s.title} className="card-soft p-6">
+          {helps.map((h) => (
+            <article key={h.title} className="card-soft p-6">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-sky-soft text-sky">
-                <s.icon className="size-5" />
+                <h.icon className="size-5" />
               </span>
-              <h3 className="mt-4 text-lg font-bold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
+              <h3 className="mt-4 text-lg font-bold">{h.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{h.text}</p>
             </article>
           ))}
         </div>
         <div className="mt-8">
-          <Button asChild variant="secondary" className="rounded-full font-bold">
-            <Link to="/services">See all services</Link>
+          <Button asChild size="lg" className="rounded-full font-bold">
+            <Link to="/activities">Explore Activities</Link>
           </Button>
         </div>
       </section>
