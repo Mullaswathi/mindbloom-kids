@@ -169,6 +169,36 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_requests: {
+        Row: {
+          child_age: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          child_age?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone: string
+        }
+        Update: {
+          child_age?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
       mood_checkins: {
         Row: {
           checked_in_at: string
