@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gamepad2, HeartHandshake, Puzzle, Timer, Trophy, UserRoundCheck, Users } from "lucide-react";
+import { Gamepad2, HeartHandshake, Puzzle, Star, Timer, Trophy, UserRoundCheck, Users } from "lucide-react";
 import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
 
