@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  ShieldCheck,
   Sparkles,
   User as UserIcon,
   X,
@@ -49,7 +50,7 @@ const links = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const name = displayName(user?.email, user?.user_metadata as Record<string, unknown> | undefined);
@@ -116,6 +117,13 @@ export function SiteHeader() {
                     <Sparkles className="size-4" /> Parent Dashboard
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">
+                      <ShieldCheck className="size-4" /> Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/bookings">
                     <CalendarCheck className="size-4" /> My Bookings
