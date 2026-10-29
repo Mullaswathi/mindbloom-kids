@@ -35,7 +35,7 @@ function publishableClient() {
 }
 
 export const submitContactRequest = createServerFn({ method: "POST" })
-  .inputValidator((data) => contactSchema.parse(data))
+  .validator((data) => contactSchema.parse(data))
   .handler(async ({ data }) => {
     try {
       const { error } = await publishableClient().from("contact_requests").insert({
