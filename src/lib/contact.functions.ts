@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -19,7 +20,6 @@ const contactSchema = z.object({
 
 function publishableClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  const { createClient } = require("@supabase/supabase-js") as typeof import("@supabase/supabase-js");
   return createClient<Database>(process.env["SUPABASE_URL"]!, key, {
     auth: { persistSession: false },
     // Opaque sb_ keys aren't JWTs; send only apikey, not the default Authorization bearer.
@@ -35,7 +35,7 @@ function publishableClient() {
 }
 
 export const submitContactRequest = createServerFn({ method: "POST" })
-  .inputValidator((data) => contactSchema.parse(data))
+  .validator((data) => contactSchema.parse(data))
   .handler(async ({ data }) => {
     try {
       const { error } = await publishableClient().from("contact_requests").insert({
