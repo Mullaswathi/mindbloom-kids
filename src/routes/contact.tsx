@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Loader2, Mail, MapPin, MessageCircle } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { submitContactRequest } from "@/lib/contact.functions";
 
 const title = "Contact MindBloom ADHD Kids — Book a Free Consultation";
 const description =
@@ -28,6 +29,14 @@ export const Route = createFileRoute("/contact")({
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s\-().]{7,20}$/, "Please enter a valid phone number, e.g. +91 98765 43210")
+    .refine((v) => {
+      const digits = (v.match(/\d/g) ?? []).length;
+      return digits >= 8 && digits <= 15;
+    }, "Please enter a valid phone number, e.g. +91 98765 43210"),
   childAge: z.string().trim().max(20).optional(),
   message: z.string().trim().min(1, "Please tell us a little about your child").max(1000),
 });
