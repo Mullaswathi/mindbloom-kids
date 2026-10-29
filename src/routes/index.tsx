@@ -1,5 +1,15 @@
+
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gamepad2, HeartHandshake, Puzzle, Star, Timer, Trophy, UserRoundCheck, Users } from "lucide-react";
+import {
+  Brain,
+  BookOpen,
+  Gamepad2,
+  Users,
+  Star,
+  HeartHandshake,
+  Timer,
+  Trophy,
+} from "lucide-react";
 import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
 
@@ -26,26 +36,26 @@ const highlights = [
   { icon: Trophy, label: "Progress Tracking" },
 ];
 
-const helps = [
+const services = [
   {
-    icon: UserRoundCheck,
-    title: "Personalized Learning",
-    text: "Activities tailored to each child's learning pace and needs.",
+    icon: Brain,
+    title: "ADHD Coaching",
+    text: "One-on-one sessions that build focus, routine and self-belief.",
   },
   {
-    icon: Puzzle,
-    title: "Fun Brain Games",
-    text: "Interactive games that encourage attention, memory, logical thinking and problem-solving.",
+    icon: BookOpen,
+    title: "Homework Help",
+    text: "Small steps, timers and checklists that make study time calmer.",
+  },
+  {
+    icon: Gamepad2,
+    title: "Brain Games",
+    text: "Attention, memory and puzzle play designed by specialists.",
   },
   {
     icon: Users,
     title: "Parent Guidance",
-    text: "Practical tips and resources to help parents support their children at home.",
-  },
-  {
-    icon: Trophy,
-    title: "Progress and Encouragement",
-    text: "Positive reinforcement to celebrate small achievements and build confidence.",
+    text: "Practical training so support continues at home every day.",
   },
 ];
 
@@ -73,27 +83,32 @@ function Index() {
       <section className="hero-surface">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <h1 className="text-4xl leading-tight font-extrabold sm:text-6xl">
+            <h1 className="mt-5 text-4xl leading-tight font-extrabold sm:text-6xl">
               Helping Every Child Learn, Grow &amp; Shine
             </h1>
+
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Every child learns differently. At MindBloom ADHD Kids we provide engaging learning
               activities, parent guidance and personalized support to help children with
               Attention-Deficit/Hyperactivity Disorder (ADHD) build confidence, focus and life
               skills.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="rounded-full font-bold">
                 <Link to="/contact">Book a Free Consultation</Link>
               </Button>
+
               <Button asChild size="lg" variant="secondary" className="rounded-full font-bold">
                 <Link to="/activities">Start Activities</Link>
               </Button>
+
               <Button asChild size="lg" variant="ghost" className="rounded-full font-bold">
                 <Link to="/parent-corner">Parent Resources</Link>
               </Button>
             </div>
           </div>
+
           <img
             src={heroKids}
             width={1600}
@@ -119,21 +134,25 @@ function Index() {
 
       <section className="mx-auto mt-20 max-w-6xl px-5">
         <h2 className="text-3xl font-extrabold">How MindBloom Helps Your Child</h2>
+
         <p className="mt-2 max-w-2xl text-muted-foreground">
           Four building blocks that work together — playful practice for your child, practical
           support for you.
         </p>
+
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {helps.map((h) => (
-            <article key={h.title} className="card-soft p-6">
+          {services.map((service) => (
+            <article key={service.title} className="card-soft p-6">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-sky-soft text-sky">
-                <h.icon className="size-5" />
+                <service.icon className="size-5" />
               </span>
-              <h3 className="mt-4 text-lg font-bold">{h.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{h.text}</p>
+
+              <h3 className="mt-4 text-lg font-bold">{service.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{service.text}</p>
             </article>
           ))}
         </div>
+
         <div className="mt-8">
           <Button asChild size="lg" className="rounded-full font-bold">
             <Link to="/activities">Explore Activities</Link>
@@ -144,6 +163,7 @@ function Index() {
       <section className="mt-20 border-y border-border bg-grass-soft/50 py-16">
         <div className="mx-auto max-w-6xl px-5">
           <h2 className="text-3xl font-extrabold">Success Stories</h2>
+
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             {testimonials.map((t) => (
               <figure key={t.name} className="card-soft p-6">
@@ -152,7 +172,9 @@ function Index() {
                     <Star key={i} className="size-4 fill-current" />
                   ))}
                 </div>
+
                 <blockquote className="mt-4 text-sm">“{t.quote}”</blockquote>
+
                 <figcaption className="mt-4 text-xs font-bold text-muted-foreground">
                   {t.name}
                 </figcaption>
@@ -167,11 +189,16 @@ function Index() {
           <span className="flex size-12 items-center justify-center rounded-2xl bg-sunny-soft text-primary">
             <Timer className="size-6" />
           </span>
-          <h2 className="text-3xl font-extrabold">Ready for a calmer week at home?</h2>
+
+          <h2 className="text-3xl font-extrabold">
+            Ready for a calmer week at home?
+          </h2>
+
           <p className="max-w-xl text-muted-foreground">
             Start with a free 20-minute consultation. We'll listen, share two strategies you can try
             tonight, and suggest a plan only if it truly fits your family.
           </p>
+
           <Button asChild size="lg" className="rounded-full font-bold">
             <Link to="/contact">Book a Free Consultation</Link>
           </Button>

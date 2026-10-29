@@ -1,3 +1,4 @@
+
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -44,7 +45,9 @@ function AuthPage() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/parent", replace: true });
+    if (!loading && user) {
+      navigate({ to: "/profile", replace: true });
+    }
   }, [loading, user, navigate]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -53,26 +56,38 @@ function AuthPage() {
 
     if (mode === "forgot") {
       const parsedEmail = z.string().trim().email().safeParse(email);
+
       if (!parsedEmail.success) {
         toast.error("Enter a valid email");
         return;
       }
+
       setBusy(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(parsedEmail.data, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        parsedEmail.data,
+        {
+          redirectTo: `${window.location.origin}/reset-password`,
+        }
+      );
+
       setBusy(false);
+
       if (error) toast.error(error.message);
       else toast.success("Password reset link sent — check your inbox.");
+
       return;
     }
 
     const parsed = schema.safeParse({ email, password, fullName });
+
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Please check your details");
       return;
     }
+
     setBusy(true);
+
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -83,12 +98,14 @@ function AuthPage() {
             data: { full_name: parsed.data.fullName || null },
           },
         });
+
         if (error) throw error;
-        toast.success("Account created successfully!");
+
         if (data.session) {
-          navigate({ to: "/parent", replace: true });
+          toast.success("Account created! Complete your family profile.");
+          navigate({ to: "/profile", replace: true });
         } else {
-          toast.info("Check your email to confirm your address, then sign in.");
+          toast.success("Account created! Check your email to confirm your address.");
           setMode("signin");
         }
       } else {
@@ -96,9 +113,11 @@ function AuthPage() {
           email: parsed.data.email,
           password: parsed.data.password,
         });
+
         if (error) throw error;
+
         toast.success("Welcome back!");
-        navigate({ to: "/parent", replace: true });
+        navigate({ to: "/profile", replace: true });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -109,17 +128,23 @@ function AuthPage() {
 
   async function onGoogle() {
     if (busy) return;
+
     setBusy(true);
+
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}/profile`,
     });
+
     if (result.error) {
       setBusy(false);
       toast.error("Google sign-in failed. Please try again.");
       return;
     }
+
     if (result.redirected) return;
-    navigate({ to: "/parent", replace: true });
+
+    navigate({ to: "/profile", replace: true });
+    setBusy(false);
   }
 
   return (
@@ -135,6 +160,7 @@ function AuthPage() {
         }
         description="MindBloom accounts belong to a parent or guardian. You stay in control of your child's profile and data."
       />
+
       <section className="mx-auto max-w-md px-5 py-16">
         <form onSubmit={onSubmit} className="card-soft grid gap-4 p-8">
           {mode === "signup" && (
@@ -149,6 +175,7 @@ function AuthPage() {
               />
             </div>
           )}
+
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -160,6 +187,7 @@ function AuthPage() {
               placeholder="you@email.com"
             />
           </div>
+
           {mode !== "forgot" && (
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
@@ -173,16 +201,23 @@ function AuthPage() {
               />
             </div>
           )}
+
           <Button type="submit" size="lg" disabled={busy} className="rounded-full font-bold">
             {busy && <Loader2 className="size-4 animate-spin" />}
-            {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
+            {mode === "signin"
+              ? "Sign in"
+              : mode === "signup"
+                ? "Create account"
+                : "Send reset link"}
           </Button>
+
           {mode !== "forgot" && (
             <>
               <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground uppercase">
                 <span className="h-px flex-1 bg-border" /> or{" "}
                 <span className="h-px flex-1 bg-border" />
               </div>
+
               <Button
                 type="button"
                 variant="secondary"
@@ -195,6 +230,7 @@ function AuthPage() {
               </Button>
             </>
           )}
+
           <div className="grid gap-1 text-center">
             <button
               type="button"
@@ -205,6 +241,7 @@ function AuthPage() {
                 ? "Already have an account? Sign in"
                 : "New here? Create a free account"}
             </button>
+
             <button
               type="button"
               className="text-sm font-semibold text-muted-foreground underline-offset-4 hover:underline"
@@ -213,6 +250,7 @@ function AuthPage() {
               {mode === "forgot" ? "Back to sign in" : "Forgot your password?"}
             </button>
           </div>
+
           <p className="text-center text-xs text-muted-foreground">
             By continuing you agree to our{" "}
             <Link to="/terms" className="underline">

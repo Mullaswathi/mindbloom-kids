@@ -1,3 +1,4 @@
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
@@ -32,13 +33,20 @@ const schema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^\+?[0-9\s\-().]{7,20}$/, "Please enter a valid phone number, e.g. +91 98765 43210")
-    .refine((v) => {
-      const digits = (v.match(/\d/g) ?? []).length;
-      return digits >= 8 && digits <= 15;
-    }, "Please enter a valid phone number, e.g. +91 98765 43210"),
+    .regex(/^\+?[0-9\s\-().]{7,20}$/, "Please enter a valid phone number")
+    .refine(
+      (value) => {
+        const digits = (value.match(/\d/g) ?? []).length;
+        return digits >= 8 && digits <= 15;
+      },
+      "Please enter a valid phone number"
+    ),
   childAge: z.string().trim().max(20).optional(),
-  message: z.string().trim().min(1, "Please tell us a little about your child").max(1000),
+  message: z
+    .string()
+    .trim()
+    .min(1, "Please tell us a little about your child")
+    .max(1000),
 });
 
 const WHATSAPP_NUMBER = "919000012345";
@@ -50,26 +58,41 @@ function Contact() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form));
     const parsed = schema.safeParse(data);
+
     if (!parsed.success) {
       const next: Record<string, string> = {};
-      for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
+
+      for (const issue of parsed.error.issues) {
+        next[String(issue.path[0])] = issue.message;
+      }
+
       setErrors(next);
       return;
     }
+
     setErrors({});
     setServerError(null);
     setSubmitting(true);
-    const result = await submitContactRequest({ data: parsed.data });
-    setSubmitting(false);
-    if (!result.ok) {
-      setServerError(result.error);
-      return;
+
+    try {
+      const result = await submitContactRequest({ data: parsed.data });
+
+      if (!result.ok) {
+        setServerError(result.error);
+        return;
+      }
+
+      toast.success("Thank you! We'll reply within one working day.");
+      form.reset();
+    } catch {
+      setServerError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    toast.success("Thank you! We'll reply within one working day.");
-    form.reset();
   }
 
   return (
@@ -79,24 +102,36 @@ function Contact() {
         title="Let's talk about your child"
         description="Tell us what a hard day looks like at home. We'll suggest a starting point — free, with no pressure to book anything."
       />
+
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-16 lg:grid-cols-[1.2fr_1fr]">
         <form onSubmit={onSubmit} noValidate className="card-soft grid gap-4 p-8">
           <div className="grid gap-2">
             <Label htmlFor="name">Your name</Label>
-            <Input id="name" name="name" maxLength={100} placeholder="Priya Sharma" />
-            {errors["name"] && <p className="text-sm text-destructive">{errors["name"]}</p>}
+            <Input
+              id="name"
+              name="name"
+              maxLength={100}
+              placeholder="Priya Sharma"
+            />
+            {errors["name"] && (
+              <p className="text-sm text-destructive">{errors["name"]}</p>
+            )}
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" maxLength={255} placeholder="you@email.com" />
-              {errors["email"] && <p className="text-sm text-destructive">{errors["email"]}</p>}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="childAge">Child's age (optional)</Label>
-              <Input id="childAge" name="childAge" maxLength={20} placeholder="8" />
-            </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              maxLength={255}
+              placeholder="you@email.com"
+            />
+            {errors["email"] && (
+              <p className="text-sm text-destructive">{errors["email"]}</p>
+            )}
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="phone">Parent/Guardian Phone Number</Label>
             <Input
@@ -108,18 +143,51 @@ function Contact() {
               placeholder="+91 98765 43210"
               autoComplete="tel"
             />
-            {errors["phone"] && <p className="text-sm text-destructive">{errors["phone"]}</p>}
+            {errors["phone"] && (
+              <p className="text-sm text-destructive">{errors["phone"]}</p>
+            )}
           </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="childAge">Child's age (optional)</Label>
+            <Input
+              id="childAge"
+              name="childAge"
+              maxLength={20}
+              placeholder="8"
+            />
+            {errors["childAge"] && (
+              <p className="text-sm text-destructive">{errors["childAge"]}</p>
+            )}
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="message">How can we help?</Label>
-            <Textarea id="message" name="message" rows={5} maxLength={1000} />
-            {errors["message"] && <p className="text-sm text-destructive">{errors["message"]}</p>}
+            <Textarea
+              id="message"
+              name="message"
+              rows={5}
+              maxLength={1000}
+            />
+            {errors["message"] && (
+              <p className="text-sm text-destructive">{errors["message"]}</p>
+            )}
           </div>
-          {serverError && <p className="text-sm text-destructive">{serverError}</p>}
-          <Button type="submit" size="lg" className="rounded-full font-bold" disabled={submitting}>
+
+          {serverError && (
+            <p className="text-sm text-destructive">{serverError}</p>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            className="rounded-full font-bold"
+            disabled={submitting}
+          >
             {submitting ? (
               <>
-                <Loader2 className="size-4 animate-spin" /> Sending…
+                <Loader2 className="size-4 animate-spin" />
+                Sending…
               </>
             ) : (
               "Book my free consultation"
@@ -140,12 +208,17 @@ function Contact() {
               </span>
               Chat on WhatsApp
             </a>
-            <a className="flex items-center gap-3 font-semibold" href="mailto:hello@mindbloomadhd.com">
+
+            <a
+              className="flex items-center gap-3 font-semibold"
+              href="mailto:hello@mindbloomadhd.com"
+            >
               <span className="flex size-10 items-center justify-center rounded-2xl bg-sunny-soft text-primary">
                 <Mail className="size-5" />
               </span>
               hello@mindbloomadhd.com
             </a>
+
             <p className="flex items-center gap-3 font-semibold">
               <span className="flex size-10 items-center justify-center rounded-2xl bg-sky-soft text-sky">
                 <MapPin className="size-5" />
@@ -153,6 +226,7 @@ function Contact() {
               Indiranagar, Bengaluru 560038
             </p>
           </div>
+
           <iframe
             title="MindBloom ADHD Kids location map"
             loading="lazy"

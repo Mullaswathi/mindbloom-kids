@@ -49,11 +49,139 @@ const guides = [
 ];
 
 const worksheets = [
-  "Morning routine picture chart",
-  "Homework chunking planner",
-  "Feelings thermometer",
-  "Weekly reward chart",
-];
+  {
+    id: "morning-routine",
+    title: "Morning routine picture chart",
+    fileName: "mindbloom-morning-routine.pdf",
+  },
+  {
+    id: "homework-planner",
+    title: "Homework chunking planner",
+    fileName: "mindbloom-homework-planner.pdf",
+  },
+  {
+    id: "feelings-thermometer",
+    title: "Feelings thermometer",
+    fileName: "mindbloom-feelings-thermometer.pdf",
+  },
+  {
+    id: "weekly-reward",
+    title: "Weekly reward chart",
+    fileName: "mindbloom-weekly-reward-chart.pdf",
+  },
+] as const;
+
+async function downloadWorksheet(id: (typeof worksheets)[number]["id"]) {
+  const worksheet = worksheets.find((item) => item.id === id);
+  if (!worksheet) return;
+
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 18;
+
+  doc.setFillColor(226, 244, 250);
+  doc.rect(0, 0, pageWidth, 43, "F");
+  doc.setTextColor(39, 82, 91);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("MINDBLOOM KIDS", margin, 16);
+  doc.setFontSize(19);
+  doc.text(worksheet.title, margin, 31, { maxWidth: pageWidth - margin * 2 });
+  doc.setTextColor(55, 65, 70);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text("Name: __________________________________", margin, 55);
+  doc.text("Date: __________________", pageWidth - 75, 55);
+
+  const checkbox = (label: string, x: number, y: number) => {
+    doc.setDrawColor(100, 116, 120);
+    doc.rect(x, y - 4, 5, 5);
+    doc.text(label, x + 9, y);
+  };
+
+  const promptLine = (label: string, y: number) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(label, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setDrawColor(170, 185, 188);
+    doc.line(margin, y + 13, pageWidth - margin, y + 13);
+  };
+
+  if (id === "morning-routine") {
+    doc.text("Check off each step as you finish it. Your routine can be your own.", margin, 69);
+    ["Get dressed", "Brush teeth", "Eat breakfast", "Pack my bag", "Shoes and coat"].forEach(
+      (step, index) => checkbox(step, margin + 2, 88 + index * 19),
+    );
+    promptLine("One thing I am looking forward to:", 194);
+    promptLine("A grown-up who can help me:", 226);
+  } else if (id === "homework-planner") {
+    doc.text("Break schoolwork into small steps. Take a short break between chunks.", margin, 69);
+    ["First task", "Next task", "Last task"].forEach((task, index) => {
+      const top = 82 + index * 57;
+      doc.setDrawColor(170, 185, 188);
+      doc.roundedRect(margin, top, pageWidth - margin * 2, 49, 3, 3);
+      doc.setFont("helvetica", "bold");
+      doc.text(task, margin + 6, top + 10);
+      doc.setFont("helvetica", "normal");
+      doc.text("Small step: __________________________________________", margin + 6, top + 23);
+      doc.text("Break after: __________________________________________", margin + 6, top + 37);
+    });
+    promptLine("When I finish, I will:", 269);
+  } else if (id === "feelings-thermometer") {
+    doc.text(
+      "Circle the level that feels closest right now. There is no wrong answer.",
+      margin,
+      69,
+    );
+    const levels = [
+      ["1", "Calm", [190, 232, 214]],
+      ["2", "Okay", [220, 239, 190]],
+      ["3", "Wiggly", [255, 237, 170]],
+      ["4", "Frustrated", [255, 211, 166]],
+      ["5", "Overwhelmed", [250, 190, 183]],
+    ] as const;
+    levels.forEach(([number, label, color], index) => {
+      const top = 82 + index * 25;
+      doc.setFillColor(...color);
+      doc.roundedRect(margin, top, pageWidth - margin * 2, 18, 3, 3, "F");
+      doc.setTextColor(45, 55, 60);
+      doc.setFont("helvetica", "bold");
+      doc.text(number, margin + 8, top + 12);
+      doc.setFont("helvetica", "normal");
+      doc.text(label, margin + 22, top + 12);
+    });
+    doc.setTextColor(55, 65, 70);
+    promptLine("I notice this in my body:", 224);
+    promptLine("Something that could help me:", 258);
+  } else {
+    doc.text("Choose a few goals together. Mark a box for each day you try.", margin, 69);
+    const labelWidth = 46;
+    const dayWidth = (pageWidth - margin * 2 - labelWidth) / 7;
+    const tableTop = 87;
+    doc.setFont("helvetica", "bold");
+    ["Goal", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((label, index) => {
+      const x = index === 0 ? margin : margin + labelWidth + (index - 1) * dayWidth;
+      doc.text(label, x + 1, tableTop);
+    });
+    doc.setFont("helvetica", "normal");
+    ["Get ready", "Start homework", "Move my body", "Wind down"].forEach((goal, row) => {
+      const y = tableTop + 12 + row * 22;
+      doc.setDrawColor(170, 185, 188);
+      doc.line(margin, y + 7, pageWidth - margin, y + 7);
+      doc.text(goal, margin + 1, y);
+      for (let day = 0; day < 7; day += 1) {
+        doc.rect(margin + labelWidth + day * dayWidth + 6, y - 4, 5, 5);
+      }
+    });
+    promptLine("When we reach our goal, we can:", 203);
+  }
+
+  doc.setFontSize(8);
+  doc.setTextColor(110, 125, 128);
+  doc.text("Small steps count. Adapt this page to fit your family.", margin, 285);
+  doc.save(worksheet.fileName);
+}
 
 const articles = [
   {
@@ -98,17 +226,21 @@ function ParentCorner() {
         <div className="card-soft mt-8 p-8">
           <h2 className="text-2xl font-bold">Free Downloadable Worksheets</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Printable and ready to stick on the fridge. Ask us for the full pack at your free
-            consultation.
+            Choose a worksheet to download a print-ready PDF instantly.
           </p>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {worksheets.map((w) => (
-              <li
-                key={w}
-                className="flex items-center gap-3 rounded-xl border border-border bg-sky-soft/50 px-4 py-3 text-sm font-semibold"
-              >
-                <Download className="size-4 text-sky" />
-                {w}
+              <li key={w.id}>
+                <button
+                  type="button"
+                  onClick={() => downloadWorksheet(w.id)}
+                  className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-border bg-sky-soft/50 px-4 py-3 text-left text-sm font-semibold transition-colors hover:bg-sky-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  aria-label={`Download ${w.title} as a PDF`}
+                >
+                  <Download className="size-4 shrink-0 text-sky" />
+                  <span className="flex-1">{w.title}</span>
+                  <span className="shrink-0 text-xs font-bold text-sky">Download PDF</span>
+                </button>
               </li>
             ))}
           </ul>
