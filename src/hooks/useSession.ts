@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/components/AuthProvider";
 
 /** Back-compat wrapper around the global AuthProvider context. */

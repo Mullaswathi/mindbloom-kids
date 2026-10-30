@@ -58,57 +58,11 @@ const guides = [
   },
 ];
 
-const worksheets: PrintableWorksheet[] = [
-  {
-    id: "morning-routine-picture-chart",
-    title: "Morning routine picture chart",
-    description: "Draw or add a picture next to each step that helps your morning feel manageable.",
-    prompts: [
-      "Wake up and get dressed",
-      "Wash, brush teeth and get ready",
-      "Eat breakfast",
-      "Pack my bag and check what I need",
-      "One thing that helps me leave home calmly",
-    ],
-  },
-  {
-    id: "homework-chunking-planner",
-    title: "Homework chunking planner",
-    description: "Break homework into smaller steps and plan a pause between focus periods.",
-    prompts: [
-      "The first small task I will start",
-      "What I need before I begin",
-      "My short focus time starts at",
-      "My movement or water break",
-      "The next small step after my break",
-    ],
-  },
-  {
-    id: "feelings-thermometer",
-    title: "Feelings thermometer",
-    description: "Check in together. Any feeling is okay; this page helps find supportive next steps.",
-    prompts: [
-      "1 - I feel calm; something that helps me stay this way",
-      "2 - I feel a little unsettled; I can ask for",
-      "3 - I need a short pause; I could try",
-      "4 - I need a grown-up to help me feel safe",
-      "5 - I need calm space and support right now",
-    ],
-  },
-  {
-    id: "weekly-reward-chart",
-    title: "Weekly reward chart",
-    description: "Choose one small goal together and celebrate practice, effort and progress.",
-    prompts: [
-      "Our small goal for this week",
-      "Monday - I practised",
-      "Tuesday - I practised",
-      "Wednesday - I practised",
-      "Thursday - I practised",
-      "Friday - I practised",
-      "How we will celebrate our effort",
-    ],
-  },
+const worksheets = [
+  "Morning routine picture chart",
+  "Homework chunking planner",
+  "Feelings thermometer",
+  "Weekly reward chart",
 ];
 
 const articles = [
@@ -191,22 +145,20 @@ function ParentCorner() {
         <div className="card-soft mt-8 p-8">
           <h2 className="text-2xl font-bold">Free Downloadable Worksheets</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-          Download a real, printable worksheet and customise it for your family.
+            Printable and ready to stick on the fridge. Ask us for the full pack at your free
+            consultation.
           </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {worksheets.map((worksheet) => (
-            <Button
-              key={worksheet.id}
-              type="button"
-              variant="secondary"
-              className="h-auto min-h-12 justify-start rounded-xl bg-sky-soft/50 px-4 py-3 text-left font-semibold"
-              onClick={() => downloadPrintablePdf(worksheet)}
-            >
-              <Download className="size-4 shrink-0 text-sky" aria-hidden="true" />
-              <span>{worksheet.title}</span>
-            </Button>
-          ))}
-          </div>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+            {worksheets.map((w) => (
+              <li
+                key={w}
+                className="flex items-center gap-3 rounded-xl border border-border bg-sky-soft/50 px-4 py-3 text-sm font-semibold"
+              >
+                <Download className="size-4 text-sky" />
+                {w}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <h2 className="mt-16 text-3xl font-extrabold">Blog Articles</h2>
@@ -367,3 +319,4 @@ function ParentCorner() {
     </>
   );
 }
+

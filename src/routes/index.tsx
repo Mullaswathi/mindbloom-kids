@@ -1,13 +1,21 @@
-import { type FormEvent, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Brain, BookOpen, Gamepad2, Users, Star, HeartHandshake, Timer, Trophy } from "lucide-react";
+import {
+  Brain,
+  BookOpen,
+  Gamepad2,
+  Users,
+  Star,
+  HeartHandshake,
+  Timer,
+  Trophy,
+} from "lucide-react";
 import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
 import { sendFeedback } from "@/lib/feedback";
 
 const title = "MindBloom ADHD Kids — Learn, Grow & Shine";
 const description =
-  "Engaging learning activities, parent guidance and personalized support helping children with ADHD build confidence, focus and life skills.";
+  "Engaging learning activities, parent guidance and personalized support helping children with Attention-Deficit/Hyperactivity Disorder (ADHD) build confidence, focus and life skills.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,10 +37,26 @@ const highlights = [
 ];
 
 const services = [
-  { icon: Brain, title: "ADHD Coaching", text: "One-on-one sessions that build focus, routine and self-belief." },
-  { icon: BookOpen, title: "Homework Help", text: "Small steps, timers and checklists that make study time calmer." },
-  { icon: Gamepad2, title: "Brain Games", text: "Attention, memory and puzzle play designed by specialists." },
-  { icon: Users, title: "Parent Guidance", text: "Practical training so support continues at home every day." },
+  {
+    icon: Brain,
+    title: "ADHD Coaching",
+    text: "One-on-one sessions that build focus, routine and self-belief.",
+  },
+  {
+    icon: BookOpen,
+    title: "Homework Help",
+    text: "Small steps, timers and checklists that make study time calmer.",
+  },
+  {
+    icon: Gamepad2,
+    title: "Brain Games",
+    text: "Attention, memory and puzzle play designed by specialists.",
+  },
+  {
+    icon: Users,
+    title: "Parent Guidance",
+    text: "Practical training so support continues at home every day.",
+  },
 ];
 
 const testimonials = [
@@ -102,39 +126,29 @@ function Index() {
       <section className="hero-surface">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-grass-soft px-4 py-1.5 text-xs font-bold tracking-wide text-accent-foreground uppercase">
-              <Star className="size-3.5" /> Evidence-informed, family-first
-            </span>
             <h1 className="mt-5 text-4xl leading-tight font-extrabold sm:text-6xl">
               Helping Every Child Learn, Grow &amp; Shine
             </h1>
+
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Every child learns differently. At MindBloom ADHD (Attention-deficit/Hyperactivity
-              Disorder) Kids we provide engaging learning activities, parent guidance and
-              personalized support to help children with ADHD build confidence, focus and life
-              skills.
+              Every child learns differently. At MindBloom ADHD Kids we provide engaging learning
+              activities, parent guidance and personalized support to help children with ADHD build
+              confidence, focus and life skills.
             </p>
-
-            <ul className="mt-8 flex max-w-[980px] flex-wrap items-center gap-4 rounded-[2rem] border border-border bg-[#f5f0d1]/80 p-4 shadow-sm">
-              {highlights.map((h) => (
-                <li key={h.label} className="flex min-w-[180px] flex-1 items-center gap-3 rounded-full">
-                  <span className="flex size-11 items-center justify-center rounded-full bg-[#f1d785] text-primary shadow-inner">
-                    <h.icon className="size-5" />
-                  </span>
-                  <span className="text-lg font-bold leading-none">{h.label}</span>
-                </li>
-              ))}
-            </ul>
-
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="rounded-full font-bold">
                 <Link to="/contact">Book a Free Consultation</Link>
               </Button>
+
               <Button asChild size="lg" variant="secondary" className="rounded-full font-bold">
                 <Link to="/activities">Start Activities</Link>
               </Button>
+              <Button asChild size="lg" variant="ghost" className="rounded-full font-bold">
+                <Link to="/parent-corner">Parent Resources</Link>
+              </Button>
             </div>
           </div>
+
           <img
             src={heroKids}
             width={1600}
@@ -146,58 +160,48 @@ function Index() {
       </section>
 
       <section className="mx-auto mt-20 max-w-6xl px-5">
-        <h2 className="text-3xl font-extrabold">Our Services</h2>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Support built around your child's strengths, delivered by psychologists, special educators
-          and occupational therapists.
-        </p>
+        <h2 className="text-3xl font-extrabold">How MindBloom Helps Your Child</h2>
 
-        <div className="mt-8 flex w-full flex-col gap-5">
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          Four building blocks that work together — playful practice for your child, practical
+          support for you.
+        </p>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s) => (
-            <article
-              key={s.title}
-              className="box-border flex w-full items-start gap-5 rounded-[2rem] border border-sky-100 bg-[#f4fbff] p-6 shadow-sm"
-            >
-              <span className="mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-[#d9f3ff] text-sky-700">
-                <s.icon className="size-8" />
+            <article key={s.title} className="card-soft p-6">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-sky-soft text-sky">
+                <s.icon className="size-5" />
               </span>
-              <div className="flex-1">
-                <h3 className="text-2xl font-extrabold leading-tight text-slate-900">{s.title}</h3>
-                <p className="mt-2 max-w-3xl text-base leading-relaxed text-slate-700">{s.text}</p>
-              </div>
+              <h3 className="mt-4 text-lg font-bold">{s.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
             </article>
           ))}
         </div>
 
         <div className="mt-8">
-          <Button asChild variant="secondary" className="rounded-full font-bold">
-            <Link to="/services">See all services</Link>
+          <Button asChild size="lg" className="rounded-full font-bold">
+            <Link to="/activities">Explore Activities</Link>
           </Button>
         </div>
       </section>
 
       <section className="mt-20 border-y border-border bg-grass-soft/50 py-16">
         <div className="mx-auto max-w-6xl px-5">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="text-3xl font-extrabold">Feedback</h2>
-            <div className="flex gap-1 text-primary">
-              {Array.from({ length: 5 }).map((_, i) => {
-                const value = i + 1;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-label={`Rate ${value} star${value > 1 ? "s" : ""}`}
-                    onClick={() => setRating(value)}
-                    className="cursor-pointer transition-transform hover:scale-110"
-                  >
-                    <Star
-                      className={`size-5 ${value <= rating ? "fill-current" : "fill-transparent"}`}
-                    />
-                  </button>
-                );
-              })}
-            </div>
+          <h2 className="text-3xl font-extrabold">Success Stories</h2>
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {testimonials.map((t) => (
+              <figure key={t.name} className="card-soft p-6">
+                <div className="flex gap-1 text-primary">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-4 fill-current" />
+                  ))}
+                </div>
+                <blockquote className="mt-4 text-sm">“{t.quote}”</blockquote>
+                <figcaption className="mt-4 text-xs font-bold text-muted-foreground">
+                  {t.name}
+                </figcaption>
+              </figure>
+            ))}
           </div>
           <form
             onSubmit={handleFeedbackSubmit}
@@ -240,11 +244,16 @@ function Index() {
           <span className="flex size-12 items-center justify-center rounded-2xl bg-sunny-soft text-primary">
             <Timer className="size-6" />
           </span>
-          <h2 className="text-3xl font-extrabold">Ready for a calmer week at home?</h2>
+
+          <h2 className="text-3xl font-extrabold">
+            Ready for a calmer week at home?
+          </h2>
+
           <p className="max-w-xl text-muted-foreground">
             Start with a free 20-minute consultation. We'll listen, share two strategies you can try
             tonight, and suggest a plan only if it truly fits your family.
           </p>
+
           <Button asChild size="lg" className="rounded-full font-bold">
             <Link to="/contact">Book a Free Consultation</Link>
           </Button>
