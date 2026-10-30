@@ -72,7 +72,7 @@ export const Route = createFileRoute("/privacy")({
       <div>
         <h2>Questions</h2>
         <p>
-          Email hello@mindbloomadhd.com and we will respond. This policy describes our current
+          Email hellomindbloomadhd@gmail.com and we will respond. This policy describes our current
           practices; it is not a statement of certified compliance with any specific regulation.
         </p>
       </div>

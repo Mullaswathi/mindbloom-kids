@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Compass, Target } from "lucide-react";
+import { Compass, MessageCircle, Phone, Target } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 
 const title = "About MindBloom ADHD Kids — Our Mission & Experts";
@@ -23,16 +23,19 @@ const experts = [
     name: "Dr. Neha Verma",
     role: "Child Psychologist",
     bio: "12 years supporting neurodivergent children and coaching families through assessment and beyond.",
+    phone: "6300342514",
   },
   {
     name: "Arjun Rao",
     role: "Special Educator",
     bio: "Builds individualised learning plans that fit real classrooms, real homework and real attention spans.",
+    phone: "7075349145",
   },
   {
     name: "Sana Iqbal",
     role: "Occupational Therapist",
     bio: "Designs sensory routines and regulation strategies children can actually use on a busy morning.",
+    phone: "9390323532",
   },
 ];
 
@@ -77,6 +80,26 @@ function About() {
               <h3 className="mt-4 text-lg font-bold">{e.name}</h3>
               <p className="text-sm font-semibold text-primary">{e.role}</p>
               <p className="mt-2 text-sm text-muted-foreground">{e.bio}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <a
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                  href={`tel:+91${e.phone}`}
+                  aria-label={`Call ${e.name}: ${e.phone}`}
+                >
+                  <Phone className="size-4" aria-hidden="true" />
+                  Call: {e.phone}
+                </a>
+                <a
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                  href={`https://wa.me/91${e.phone}?text=${encodeURIComponent(`Hi ${e.name}, I'd like to chat about your services at MindBloom ADHD Kids.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Chat with ${e.name} on WhatsApp`}
+                >
+                  <MessageCircle className="size-4" aria-hidden="true" />
+                  Chat
+                </a>
+              </div>
             </article>
           ))}
         </div>

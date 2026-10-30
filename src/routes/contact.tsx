@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,11 +28,12 @@ export const Route = createFileRoute("/contact")({
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
+  phone: z.string().trim().max(20).optional(),
   childAge: z.string().trim().max(20).optional(),
   message: z.string().trim().min(1, "Please tell us a little about your child").max(1000),
 });
 
-const WHATSAPP_NUMBER = "919000012345";
+const WHATSAPP_NUMBER = "919392483324";
 
 function Contact() {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,6 +80,17 @@ function Contact() {
             </div>
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="phone">Phone number (optional)</Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              maxLength={20}
+              placeholder="+91 98765 43210"
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="message">How can we help?</Label>
             <Textarea id="message" name="message" rows={5} maxLength={1000} />
             {errors["message"] && <p className="text-sm text-destructive">{errors["message"]}</p>}
@@ -89,7 +101,7 @@ function Contact() {
         </form>
 
         <div className="grid gap-6">
-          <div className="card-soft grid gap-4 p-8 text-sm">
+          <div className="card-soft grid content-start gap-8 p-8 text-sm">
             <a
               className="flex items-center gap-3 font-semibold"
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi MindBloom, I'd like to book a free consultation.")}`}
@@ -101,26 +113,13 @@ function Contact() {
               </span>
               Chat on WhatsApp
             </a>
-            <a className="flex items-center gap-3 font-semibold" href="mailto:hello@mindbloomadhd.com">
+            <a className="flex items-center gap-3 font-semibold" href="mailto:hellomindbloomadhd@gmail.com">
               <span className="flex size-10 items-center justify-center rounded-2xl bg-sunny-soft text-primary">
                 <Mail className="size-5" />
               </span>
-              hello@mindbloomadhd.com
+              hellomindbloomadhd@gmail.com
             </a>
-            <p className="flex items-center gap-3 font-semibold">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-sky-soft text-sky">
-                <MapPin className="size-5" />
-              </span>
-              Indiranagar, Bengaluru 560038
-            </p>
           </div>
-          <iframe
-            title="MindBloom ADHD Kids location map"
-            loading="lazy"
-            className="h-72 w-full rounded-[var(--radius-2xl)] border border-border"
-            referrerPolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps?q=Indiranagar,Bengaluru&output=embed"
-          />
         </div>
       </section>
     </>

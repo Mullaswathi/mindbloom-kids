@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -48,13 +48,10 @@ export function SiteFooter() {
           <h4 className="font-bold">Reach us</h4>
           <ul className="mt-2 grid gap-2 text-muted-foreground">
             <li className="flex items-center gap-2">
-              <Mail className="size-4" /> hello@mindbloomadhd.com
+              <Mail className="size-4" /> hellomindbloomadhd@gmail.com
             </li>
             <li className="flex items-center gap-2">
-              <MessageCircle className="size-4" /> WhatsApp: +91 90000 12345
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin className="size-4" /> Bengaluru, India
+              <MessageCircle className="size-4" /> WhatsApp: +91 93924 83324
             </li>
           </ul>
         </div>
