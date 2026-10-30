@@ -1,14 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const recipient = "hellomindbloomadhd@gmail.com";
+const recipients = ["hellomindbloomadhd@gmail.com"];
 const resendEndpoint = "https://api.resend.com/emails";
 
 type FeedbackSendResult =
   | { success: true }
   | {
       success: false;
-      reason: "not_configured" | "sender_rejected" | "provider_error" | "network_error";
+      reason:
+        | "not_configured"
+        | "api_key_rejected"
+        | "sender_rejected"
+        | "provider_error"
+        | "network_error";
     };
 
 export const sendFeedback = createServerFn({ method: "POST" })
@@ -38,7 +43,7 @@ export const sendFeedback = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           from,
-          to: [recipient],
+          to: recipients,
           subject: "MindBloom ADHD Kids feedback",
           text: `${data.rating ? `Rating: ${data.rating}/5\n\n` : ""}Feedback:\n${data.feedback}`,
         }),
@@ -66,13 +71,14 @@ export const sendFeedback = createServerFn({ method: "POST" })
               : undefined,
         });
 
-        return {
-          success: false,
-          reason:
-            response.status === 401 || response.status === 403 || response.status === 422
+        const reason =
+          response.status === 401
+            ? "api_key_rejected"
+            : response.status === 403 || response.status === 422
               ? "sender_rejected"
-              : "provider_error",
-        } satisfies FeedbackSendResult;
+              : "provider_error";
+
+        return { success: false, reason } satisfies FeedbackSendResult;
       }
 
       return { success: true } satisfies FeedbackSendResult;

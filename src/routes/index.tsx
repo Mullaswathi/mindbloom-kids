@@ -71,10 +71,16 @@ function Index() {
         setRating(0);
         setFeedbackStatus("Thank you! Your feedback has been sent.");
       } else if (result.reason === "not_configured") {
-        setFeedbackStatus("Feedback email is temporarily unavailable. Please try again later.");
+        setFeedbackStatus(
+          "Feedback email isn't configured. The site owner needs to add the Resend API key and sender address.",
+        );
+      } else if (result.reason === "api_key_rejected") {
+        setFeedbackStatus(
+          "The feedback email API key was rejected. The site owner needs to replace the Resend key.",
+        );
       } else if (result.reason === "sender_rejected") {
         setFeedbackStatus(
-          "Feedback couldn't be sent due to an email configuration issue. Please try again later.",
+          "The sender address wasn't accepted. The site owner needs to verify the sender domain in Resend.",
         );
       } else if (result.reason === "network_error") {
         setFeedbackStatus("Couldn't connect to the feedback email service. Please try again.");
