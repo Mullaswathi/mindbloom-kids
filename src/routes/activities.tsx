@@ -1,13 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Award, Brain, Check, Palette, Puzzle, Search, Sparkles, Timer, Wind } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent } from "react";
+import {
+  Brain,
+  Check,
+  Eraser,
+  Pencil,
+  Puzzle,
+  RotateCcw,
+  Type,
+  Timer,
+  Wind,
+} from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 
 const title = "Interactive Activities — Focus, Memory & Calm for ADHD Kids";
 const description =
-  "Attention games, memory challenges, brain puzzles, pattern games, a daily habit tracker and calm breathing exercises children can use today.";
+  "Focus and memory games, a child-friendly digital writing slate, a daily habit tracker and calm breathing exercises.";
 
 export const Route = createFileRoute("/activities")({
   head: () => ({
@@ -22,111 +40,336 @@ export const Route = createFileRoute("/activities")({
 });
 
 const activities = [
-  { icon: Brain, title: "Attention Games", text: "Spot-the-change and sorting challenges in 3-minute rounds." },
-  { icon: Puzzle, title: "Memory Challenges", text: "Card pairs and sequence recall that get harder as skills grow." },
-  { icon: Puzzle, title: "Brain Puzzles", text: "Logic and pattern puzzles for a quick, satisfying win." },
-  { icon: Award, title: "Reward System", text: "Stars for effort, not perfection — cash them in for family treats." },
+  {
+    id: "attention",
+    icon: Brain,
+    title: "Attention Games",
+    text: "Spot the color match in a quick, fun round.",
+  },
+  {
+    id: "memory",
+    icon: Puzzle,
+    title: "Memory Challenges",
+    text: "Remember the number and see how many rounds you can complete.",
+  },
+  {
+    id: "puzzles",
+    icon: Puzzle,
+    title: "Brain Puzzles",
+    text: "Find the odd one out in a set of playful pictures.",
+  },
+  {
+    id: "matching",
+    icon: Puzzle,
+    title: "Matching Card Game",
+    text: "Turn over the cards and find all the matching pairs.",
+  },
 ];
 
 const habits = ["Morning routine done", "20 minutes reading", "Movement break", "Screens off before bed"];
+type GameId = (typeof activities)[number]["id"];
 
 function Activities() {
+  const [activeGame, setActiveGame] = useState<GameId | null>(null);
+
   return (
     <>
-      {activeGame === null && (
-        <PageHero
-          eyebrow="Interactive activities"
-          title="Play that quietly builds focus"
-          description="Short, repeatable activities designed with occupational therapists — do one before homework or whenever the day needs a reset."
-        />
-      )}
+      <PageHero
+        eyebrow="Interactive activities"
+        title="Play that quietly builds focus"
+        description="Short, repeatable activities designed with occupational therapists — do one before homework or whenever the day needs a reset."
+      />
       <section className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {activities.map((a) => (
             <article
               key={a.title}
-              className="card-soft p-6 transition-transform duration-200 hover:-translate-y-1"
+              className="card-soft flex h-full flex-col p-6 transition-transform duration-200 hover:-translate-y-1"
             >
               <span className="flex size-11 items-center justify-center rounded-2xl bg-grass-soft text-grass">
                 <a.icon className="size-5" />
               </span>
               <h2 className="mt-4 text-lg font-bold">{a.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{a.text}</p>
+              <Button
+                type="button"
+                className="mt-auto mt-5 w-full rounded-full font-bold"
+                onClick={() => setActiveGame(a.id)}
+              >
+                Play
+              </Button>
             </article>
           ))}
         </div>
 
-        <MindGames />
-
-            <div className="mt-8 grid gap-5 lg:grid-cols-3">
-              <FocusTimer />
-              <HabitTracker id="habit-tracker" />
-              <BreathingExercise />
+        <Dialog
+          open={activeGame !== null}
+          onOpenChange={(open) => {
+            if (!open) setActiveGame(null);
+          }}
+        >
+          <DialogContent className="fixed inset-0 left-0 top-0 block h-dvh w-screen max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none border-0 p-4 sm:rounded-none sm:p-8 [&>button]:hidden">
+            <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col">
+              <DialogHeader className="mb-8 pr-8 text-left">
+                <DialogTitle className="text-3xl font-extrabold">
+                  {activities.find((activity) => activity.id === activeGame)?.title}
+                </DialogTitle>
+                <DialogDescription>
+                  {activities.find((activity) => activity.id === activeGame)?.text}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-1 items-center justify-center rounded-3xl bg-grass-soft/40 p-4 sm:p-8">
+                {activeGame === "attention" && <ColorMatch />}
+                {activeGame === "memory" && <NumberMemory />}
+                {activeGame === "puzzles" && <OddOneOut />}
+                {activeGame === "matching" && <MatchingCardGame />}
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setActiveGame(null)}
+                  className="rounded-full font-bold"
+                >
+                  Exit
+                </Button>
+              </div>
             </div>
-          </>
-        )}
+          </DialogContent>
+        </Dialog>
+
+        <WritingSlate />
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <FocusTimer />
+          <HabitTracker id="habit-tracker" />
+          <BreathingExercise />
+        </div>
       </section>
     </>
   );
 }
 
-const games = [
-  {
-    id: "color",
-    label: "Color Match",
-    icon: Palette,
-    tab: "bg-sky-soft text-sky",
-    tabActive: "bg-sky text-primary-foreground",
-  },
-  {
-    id: "memory",
-    label: "Number Memory",
-    icon: Sparkles,
-    tab: "bg-sunny-soft text-primary",
-    tabActive: "bg-sunny text-accent-foreground",
-  },
-  {
-    id: "odd",
-    label: "Odd One Out",
-    icon: Search,
-    tab: "bg-grass-soft text-grass",
-    tabActive: "bg-grass text-primary-foreground",
-  },
-] as const;
+const slateColors = [
+  { name: "Chalk white", value: "#ffffff" },
+  { name: "Blue", value: "#168bd2" },
+  { name: "Green", value: "#36a66a" },
+  { name: "Orange", value: "#f58220" },
+  { name: "Purple", value: "#9364c7" },
+  { name: "Black", value: "#24364b" },
+];
 
-function MindGames() {
-  const [tab, setTab] = useState<(typeof games)[number]["id"]>("color");
+function WritingSlate() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const activePointer = useRef<number | null>(null);
+  const lastPoint = useRef<{ x: number; y: number } | null>(null);
+  const [tool, setTool] = useState<"pen" | "eraser" | "text">("pen");
+  const [color, setColor] = useState(slateColors[0]!.value);
+  const [brushSize, setBrushSize] = useState(8);
+  const [text, setText] = useState("");
+
+  const getPoint = (event: PointerEvent<HTMLCanvasElement>) => {
+    const canvas = event.currentTarget;
+    const bounds = canvas.getBoundingClientRect();
+    return {
+      x: ((event.clientX - bounds.left) / bounds.width) * canvas.width,
+      y: ((event.clientY - bounds.top) / bounds.height) * canvas.height,
+    };
+  };
+
+  const startStroke = (event: PointerEvent<HTMLCanvasElement>) => {
+    const canvas = event.currentTarget;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    event.preventDefault();
+    const point = getPoint(event);
+
+    if (tool === "text") {
+      if (!text.trim()) return;
+      context.globalCompositeOperation = "source-over";
+      context.fillStyle = color;
+      context.font = `${Math.max(20, brushSize * 4)}px "Comic Sans MS", "Chalkboard", cursive`;
+      context.textBaseline = "top";
+      context.fillText(text.trim(), point.x, point.y, canvas.width - point.x);
+      return;
+    }
+
+    canvas.setPointerCapture(event.pointerId);
+    activePointer.current = event.pointerId;
+    lastPoint.current = point;
+
+    context.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+    context.fillStyle = color;
+    context.strokeStyle = color;
+    context.lineWidth = brushSize * (tool === "eraser" ? 4 : 1);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    context.arc(point.x, point.y, context.lineWidth / 2, 0, Math.PI * 2);
+    context.fill();
+  };
+
+  const continueStroke = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (activePointer.current !== event.pointerId || !lastPoint.current) return;
+    const context = event.currentTarget.getContext("2d");
+    if (!context) return;
+
+    event.preventDefault();
+    const point = getPoint(event);
+    context.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+    context.strokeStyle = color;
+    context.lineWidth = brushSize * (tool === "eraser" ? 4 : 1);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    context.moveTo(lastPoint.current.x, lastPoint.current.y);
+    context.lineTo(point.x, point.y);
+    context.stroke();
+    lastPoint.current = point;
+  };
+
+  const endStroke = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (activePointer.current !== event.pointerId) return;
+    activePointer.current = null;
+    lastPoint.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const clearSlate = () => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
+  };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-extrabold">More mind games</h2>
+    <section className="mt-8" aria-labelledby="writing-slate-title">
+      <h2 id="writing-slate-title" className="text-2xl font-extrabold">
+        My Little Writing Slate ✏️
+      </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Pick a tab and play a quick round — each one trains a different thinking muscle.
+        Draw or write with your finger, a stylus, or your mouse.
       </p>
-      <div className="mt-5 flex flex-wrap gap-3">
-        {games.map((g) => {
-          const active = tab === g.id;
-          return (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => setTab(g.id)}
-              className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:-translate-y-1 ${
-                active ? `${g.tabActive} -translate-y-1 shadow-md` : g.tab
-              }`}
-            >
-              <g.icon className="size-4" />
-              {g.label}
-            </button>
-          );
-        })}
+      <div className="card-soft mt-5 p-4 sm:p-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant={tool === "pen" ? "default" : "secondary"}
+            className="rounded-full font-bold"
+            aria-pressed={tool === "pen"}
+            onClick={() => setTool("pen")}
+          >
+            <Pencil className="mr-2 size-4" />
+            Pen
+          </Button>
+          <Button
+            type="button"
+            variant={tool === "eraser" ? "default" : "secondary"}
+            className="rounded-full font-bold"
+            aria-pressed={tool === "eraser"}
+            onClick={() => setTool("eraser")}
+          >
+            <Eraser className="mr-2 size-4" />
+            Eraser
+          </Button>
+          <Button
+            type="button"
+            variant={tool === "text" ? "default" : "secondary"}
+            className="rounded-full font-bold"
+            aria-pressed={tool === "text"}
+            onClick={() => setTool("text")}
+          >
+            <Type className="mr-2 size-4" />
+            Text
+          </Button>
+
+          <div className="flex items-center gap-2" role="group" aria-label="Pen color">
+            {slateColors.map((swatch) => (
+              <button
+                key={swatch.value}
+                type="button"
+                aria-label={`${swatch.name} pen`}
+                aria-pressed={color === swatch.value}
+                onClick={() => {
+                  setColor(swatch.value);
+                }}
+                className={`size-8 rounded-full border-2 ${color === swatch.value ? "border-foreground ring-2 ring-ring ring-offset-2" : "border-white shadow"}`}
+                style={{ backgroundColor: swatch.value }}
+              />
+            ))}
+            <label className="flex size-8 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border text-xs font-bold">
+              <span className="sr-only">Choose custom pen color</span>
+              <input
+                type="color"
+                aria-label="Choose custom pen color"
+                value={color}
+                onChange={(event) => {
+                  setColor(event.target.value);
+                }}
+                className="size-10 cursor-pointer"
+              />
+            </label>
+          </div>
+
+          {tool === "text" && (
+            <input
+              type="text"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              maxLength={100}
+              aria-label="Text to write on slate"
+              placeholder="Type a word, then tap the slate"
+              className="min-w-52 flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm"
+            />
+          )}
+
+          <label className="flex min-w-40 flex-1 items-center gap-2 text-sm font-semibold">
+            Thickness
+            <input
+              type="range"
+              min="2"
+              max="24"
+              value={brushSize}
+              onChange={(event) => setBrushSize(Number(event.target.value))}
+              aria-label="Brush thickness"
+              className="w-full accent-primary"
+            />
+            <span className="w-6 text-right tabular-nums">{brushSize}</span>
+          </label>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-full font-bold"
+            onClick={clearSlate}
+          >
+            <RotateCcw className="mr-2 size-4" />
+            Clear Slate
+          </Button>
+        </div>
+        <div className="mt-4 rounded-2xl border-4 border-[#80502d] bg-[#a87343] p-1.5 shadow-inner sm:border-[10px] sm:p-2">
+          <canvas
+            ref={canvasRef}
+            width={1200}
+            height={480}
+            aria-label="Writing slate drawing area"
+            onPointerDown={startStroke}
+            onPointerMove={continueStroke}
+            onPointerUp={endStroke}
+            onPointerCancel={endStroke}
+            className={`block aspect-[5/2] w-full touch-none rounded-lg border border-[#16432f] bg-[#245b40] shadow-inner ${
+              tool === "text" ? "cursor-text" : ""
+            }`}
+            style={{
+              backgroundImage:
+                "radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.035), transparent 55%), radial-gradient(ellipse at 80% 75%, rgba(0,0,0,0.09), transparent 60%)",
+            }}
+          />
+        </div>
       </div>
-      <div key={tab} className="card-soft mt-5 animate-fade-in p-6">
-        {tab === "color" && <ColorMatch />}
-        {tab === "memory" && <NumberMemory />}
-        {tab === "odd" && <OddOneOut />}
-      </div>
-    </div>
+    </section>
   );
 }
 
@@ -188,9 +431,9 @@ function NumberMemory() {
     return () => clearTimeout(id);
   }, [phase]);
 
-  const start = (len: number) => {
+  const start = (roundIndex: number) => {
     setDigits(
-      Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join(""),
+      Array.from({ length: roundIndex + 1 }, () => Math.floor(Math.random() * 10)).join(""),
     );
     setGuess("");
     setRound(roundIndex);
@@ -241,7 +484,9 @@ function NumberMemory() {
             placeholder="Type it"
           />
         ) : (
-          <p className="font-display text-3xl font-extrabold text-muted-foreground">Level {level}</p>
+          <p className="font-display text-3xl font-extrabold text-muted-foreground">
+            {phase === "idle" ? "Ready?" : `Level ${round + 1}`}
+          </p>
         )}
       </div>
       <div className="mt-6 flex justify-center gap-3">
@@ -369,95 +614,96 @@ function OddOneOut() {
   );
 }
 
-const rewardGoals = [
-  "Try one focus game",
-  "Finish one small task",
-  "Take a movement break",
-  "Practice a calm breath",
-  "Read for 10 minutes",
-];
+const matchingFaces = ["🐸", "🦋", "🐢", "🐝", "🐙", "🐳"];
 
-const rewardChoices = [
-  { name: "Pick a family story", cost: 2 },
-  { name: "Choose the family music", cost: 3 },
-  { name: "Pick a family activity", cost: 5 },
-];
+function createMatchingDeck() {
+  return [...matchingFaces, ...matchingFaces]
+    .map((emoji, id) => ({ id, emoji, order: Math.random() }))
+    .sort((a, b) => a.order - b.order)
+    .map(({ id, emoji }) => ({ id, emoji }));
+}
 
-function RewardGame() {
-  const [completedGoals, setCompletedGoals] = useState<string[]>([]);
-  const [stars, setStars] = useState(0);
-  const [claimedRewards, setClaimedRewards] = useState<string[]>([]);
+function MatchingCardGame() {
+  const [cards, setCards] = useState(createMatchingDeck);
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
 
-  const reset = () => {
-    setCompletedGoals([]);
-    setStars(0);
-    setClaimedRewards([]);
+  useEffect(() => {
+    if (flipped.length !== 2) return;
+
+    const [first, second] = flipped;
+    if (first === undefined || second === undefined) return;
+    const isMatch = cards[first]?.emoji === cards[second]?.emoji;
+    const timeout = window.setTimeout(
+      () => {
+        if (isMatch) setMatched((current) => [...current, first, second]);
+        setFlipped([]);
+      },
+      isMatch ? 450 : 900,
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [cards, flipped]);
+
+  const restart = () => {
+    setCards(createMatchingDeck());
+    setFlipped([]);
+    setMatched([]);
+    setMoves(0);
   };
 
+  const chooseCard = (id: number) => {
+    if (flipped.length === 2 || flipped.includes(id) || matched.includes(id)) return;
+    setFlipped((current) => [...current, id]);
+    if (flipped.length === 1) setMoves((current) => current + 1);
+  };
+
+  const complete = matched.length === cards.length;
+
   return (
-    <div className="mx-auto max-w-xl">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Celebrate effort, one step at a time.</p>
-          <h3 className="mt-1 text-xl font-extrabold">Your stars: {stars} ⭐</h3>
+    <div className="w-full max-w-3xl text-center">
+      {complete ? (
+        <div role="status" aria-live="polite">
+          <h3 className="text-3xl font-extrabold">You found every pair! 🎉</h3>
+          <p className="mt-3 text-muted-foreground">You matched all the cards in {moves} moves.</p>
+          <Button className="mt-6 rounded-full font-bold" onClick={restart}>
+            Play again
+          </Button>
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          className="rounded-full font-bold"
-          onClick={reset}
-        >
-          Start over
-        </Button>
-      </div>
-
-      <h4 className="mt-6 font-bold">Earn a star</h4>
-      <div className="mt-3 grid gap-2">
-        {rewardGoals.map((goal) => {
-          const complete = completedGoals.includes(goal);
-          return (
-            <Button
-              key={goal}
-              type="button"
-              variant={complete ? "secondary" : "outline"}
-              disabled={complete}
-              className="min-h-11 justify-between whitespace-normal rounded-xl font-semibold"
-              onClick={() => {
-                setCompletedGoals((current) => [...current, goal]);
-                setStars((current) => current + 1);
-              }}
-            >
-              {goal}
-              <span>{complete ? "Earned ⭐" : "+1 ⭐"}</span>
-            </Button>
-          );
-        })}
-      </div>
-
-      <h4 className="mt-6 font-bold">Choose a family reward</h4>
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
-        {rewardChoices.map((reward) => {
-          const claimed = claimedRewards.includes(reward.name);
-          return (
-            <Button
-              key={reward.name}
-              type="button"
-              variant="secondary"
-              disabled={claimed || stars < reward.cost}
-              className="h-auto min-h-16 whitespace-normal rounded-xl px-3 py-2 font-semibold"
-              onClick={() => {
-                setStars((current) => current - reward.cost);
-                setClaimedRewards((current) => [...current, reward.name]);
-              }}
-            >
-              {claimed ? "Chosen!" : `${reward.name} · ${reward.cost} ⭐`}
-            </Button>
-          );
-        })}
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Choose rewards together with a grown-up. Every effort counts.
-      </p>
+      ) : (
+        <>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <p className="font-bold">Find all 6 matching pairs 🧠</p>
+            <p className="text-sm font-semibold">Moves: {moves}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4">
+            {cards.map((card) => {
+              const isFaceUp = flipped.includes(card.id) || matched.includes(card.id);
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  aria-label={isFaceUp ? `Card ${card.emoji}` : "Turn over card"}
+                  aria-pressed={isFaceUp}
+                  disabled={matched.includes(card.id) || flipped.length === 2}
+                  onClick={() => chooseCard(card.id)}
+                  className={`flex aspect-square items-center justify-center rounded-2xl text-4xl shadow-sm transition-all sm:text-6xl ${
+                    isFaceUp
+                      ? "scale-[0.98] bg-white"
+                      : "bg-sky-soft hover:-translate-y-1 hover:shadow-md"
+                  } disabled:cursor-default`}
+                >
+                  {isFaceUp ? card.emoji : "❔"}
+                </button>
+              );
+            })}
+          </div>
+          <Button variant="secondary" className="mt-6 rounded-full font-bold" onClick={restart}>
+            Start over
+          </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -616,4 +862,3 @@ function BreathingExercise() {
     </article>
   );
 }
-

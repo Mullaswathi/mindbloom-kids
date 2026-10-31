@@ -1,3 +1,5 @@
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Brain,
@@ -5,9 +7,7 @@ import {
   Gamepad2,
   Users,
   Star,
-  HeartHandshake,
   Timer,
-  Trophy,
 } from "lucide-react";
 import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
@@ -28,13 +28,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
-
-const highlights = [
-  { icon: HeartHandshake, label: "Personalized Learning" },
-  { icon: Users, label: "Parent Support" },
-  { icon: Gamepad2, label: "Interactive Games" },
-  { icon: Trophy, label: "Progress Tracking" },
-];
 
 const services = [
   {
@@ -59,24 +52,6 @@ const services = [
   },
 ];
 
-const testimonials = [
-  {
-    quote:
-      "Aarav used to melt down over homework. Six weeks in, he sets his own timer and finishes maths before dinner.",
-    name: "Priya S., parent of a 9-year-old",
-  },
-  {
-    quote:
-      "The parent training changed how we talk at home. Fewer arguments, far more wins worth celebrating.",
-    name: "Rahul & Meera, Pune",
-  },
-  {
-    quote:
-      "The focus games feel like play to my daughter, but her teacher noticed the difference in class first.",
-    name: "Fatima K., Hyderabad",
-  },
-];
-
 function Index() {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -92,7 +67,6 @@ function Index() {
       const result = await sendFeedback({ data: { feedback, rating } });
       if (result.success) {
         setFeedback("");
-        setRating(0);
         setFeedbackStatus("Thank you! Your feedback has been sent.");
       } else if (result.reason === "not_configured") {
         setFeedbackStatus(
@@ -143,9 +117,6 @@ function Index() {
               <Button asChild size="lg" variant="secondary" className="rounded-full font-bold">
                 <Link to="/activities">Start Activities</Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="rounded-full font-bold">
-                <Link to="/parent-corner">Parent Resources</Link>
-              </Button>
             </div>
           </div>
 
@@ -166,7 +137,7 @@ function Index() {
           Four building blocks that work together — playful practice for your child, practical
           support for you.
         </p>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-5">
           {services.map((s) => (
             <article key={s.title} className="card-soft p-6">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-sky-soft text-sky">
@@ -185,27 +156,12 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-20 border-y border-border bg-grass-soft/50 py-16">
-        <div className="mx-auto max-w-6xl px-5">
-          <h2 className="text-3xl font-extrabold">Success Stories</h2>
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {testimonials.map((t) => (
-              <figure key={t.name} className="card-soft p-6">
-                <div className="flex gap-1 text-primary">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="size-4 fill-current" />
-                  ))}
-                </div>
-                <blockquote className="mt-4 text-sm">“{t.quote}”</blockquote>
-                <figcaption className="mt-4 text-xs font-bold text-muted-foreground">
-                  {t.name}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+      <section className="mx-auto mt-20 max-w-6xl px-5">
+        <div className="rounded-3xl bg-grass-soft/60 p-6 sm:p-8">
+          <h2 className="text-3xl font-extrabold">Feedback</h2>
           <form
             onSubmit={handleFeedbackSubmit}
-            className="mb-8 flex items-center gap-3 rounded-full border border-border bg-white/80 px-4 py-3 shadow-sm"
+            className="mt-6 flex items-center gap-3 rounded-full border border-border bg-white/80 px-4 py-3 shadow-sm"
           >
             <input
               type="text"
@@ -219,8 +175,30 @@ function Index() {
               maxLength={2000}
               disabled={sendingFeedback}
               placeholder="Type your feedback..."
+              aria-label="Your feedback"
               className="w-full border-0 bg-transparent text-base text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
+            <div
+              role="group"
+              aria-label="Rate your experience"
+              className="flex shrink-0 items-center gap-1"
+            >
+              {Array.from({ length: 5 }, (_, index) => {
+                const value = index + 1;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-label={`Rate ${value} out of 5`}
+                    aria-pressed={rating === value}
+                    onClick={() => setRating(value)}
+                    className="rounded-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2"
+                  >
+                    <Star className={`size-5 ${rating >= value ? "fill-current" : ""}`} />
+                  </button>
+                );
+              })}
+            </div>
             <Button
               type="submit"
               size="sm"
@@ -231,11 +209,10 @@ function Index() {
             </Button>
           </form>
           {feedbackStatus && (
-            <p role="status" aria-live="polite" className="mb-8 text-sm text-muted-foreground">
+            <p role="status" aria-live="polite" className="mt-3 text-sm text-muted-foreground">
               {feedbackStatus}
             </p>
           )}
-
         </div>
       </section>
 

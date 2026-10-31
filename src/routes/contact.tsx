@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Loader2, Mail, MessageCircle } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,12 @@ export const Route = createFileRoute("/contact")({
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s\-().]{7,20}$/, "Please enter a valid phone number")
+    .refine((value) => (value.match(/\d/g) ?? []).length >= 8, "Please enter a valid phone number")
+    .refine((value) => (value.match(/\d/g) ?? []).length <= 15, "Please enter a valid phone number"),
   childAge: z.string().trim().max(20).optional(),
   message: z
     .string()
@@ -202,12 +208,6 @@ function Contact() {
               </span>
               hellomindbloomadhd@gmail.com
             </a>
-            <p className="flex items-center gap-3 font-semibold">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-sky-soft text-sky">
-                <MapPin className="size-5" />
-              </span>
-              Indiranagar, Bengaluru 560038
-            </p>
           </div>
         </div>
       </section>
